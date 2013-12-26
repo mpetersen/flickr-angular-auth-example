@@ -1,0 +1,4 @@
+# Rename to `flickr.properties` and fill in the API-key and secret.
+
+api.key = your_api_key_here
+api.secret = your_api_secret_here
