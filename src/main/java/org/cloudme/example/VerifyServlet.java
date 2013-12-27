@@ -17,7 +17,7 @@ import org.scribe.model.Verifier;
 
 @WebServlet( "/verify" )
 public class VerifyServlet extends HttpServlet {
-    private static final String BASE_URL = "/index.html#/authorize/";
+    private static final String BASE_URL = "/#/authorize/";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -25,8 +25,11 @@ public class VerifyServlet extends HttpServlet {
         String token = req.getParameter(TOKEN);
         Verifier verifier = new Verifier(req.getParameter(VERIFIER));
         Token requestToken = new Token(token, secret);
-        FlickrAccount account = new FlickrService().verify(requestToken, verifier, req);
-        req.getSession().setAttribute(account.getClientToken(), account);
-        resp.sendRedirect(BASE_URL + account.getClientToken());
+        FlickrService service = new FlickrService();
+        FlickrAccount account = service.verify(requestToken, verifier, req);
+        // Caution! Very unsafe, just for demonstration purposes:
+        String clientToken = String.valueOf(System.currentTimeMillis());
+        req.getSession().setAttribute(clientToken, account);
+        resp.sendRedirect(BASE_URL + clientToken);
     }
 }

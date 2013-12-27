@@ -32,8 +32,6 @@ public class FlickrService {
         Token accessToken = service().getAccessToken(requestToken, verifier);
         FlickrAccount account = testLogin(accessToken);
         account.setAccessToken(accessToken);
-        // Caution! Very unsafe, just for demonstration purposes:
-        account.setClientToken(String.valueOf(System.currentTimeMillis()));
         return account;
     }
     

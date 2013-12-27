@@ -21,7 +21,8 @@ public class PhotosServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
         else {
-            InputStream in = new FlickrService().photosSearch(account);
+            FlickrService service = new FlickrService();
+            InputStream in = service.photosSearch(account);
             ByteStreams.copy(in, resp.getOutputStream());
         }
     }

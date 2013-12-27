@@ -16,6 +16,8 @@ in your API Key and Secret.
 This project uses the Maven Jetty plugin. So no additional application server is required. Just run:
 
      #> mvn clean jetty:run
+     
+Then open your favourite browser and type: [`http://localhost:8080`](http://localhost:8080).
 
 ### Additional information
 

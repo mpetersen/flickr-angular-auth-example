@@ -10,7 +10,6 @@ public class FlickrAccount {
     private String username;
     private String oauthSecret;
     private String oauthToken;
-    private String clientToken;
     
     public void setAccessToken(Token accessToken) {
         oauthSecret = accessToken.getSecret();
@@ -35,13 +34,5 @@ public class FlickrAccount {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getClientToken() {
-        return clientToken;
-    }
-
-    public void setClientToken(String clientToken) {
-        this.clientToken = clientToken;
     }
 }
