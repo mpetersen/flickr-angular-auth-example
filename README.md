@@ -27,3 +27,23 @@ It also shows:
 - How to use the Servlet 3.0 API
 - How to use Jackson for JSON parsing
 - How to use Scribe for OAuth authentication
+
+### Implementation details
+
+#### Backend: Java
+
+On the server side, the example is written in Java. It uses the Jetty server and the Servlet 3.0 API. It also uses Jackson 
+for JSON parsing and Scribe for OAuth authentication. The main classes are:
+
+- *Servlet: Three servlet classes for authentication, validation (of OAuth) and providing photo data.
+- Flickr*: The classes used to interact with the Flickr web services.
+
+#### Frontend: JavaScript
+
+The client is a simple JavaScript client using AngularJS. The libraries are provided through Maven webjars. 
+
+- index.html: The main page.
+- js/app.js: The actual "business logic", displaying photos.
+- js/flickrAuth.js: The implementation of authentication handling. This is actually reusable and could be even used in other
+applications.
+- partials/photos.html: The template showing the photos from Flickr. 
