@@ -12,13 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet( "/authorize" )
 public class AuthorizeServlet extends HttpServlet {
+    private final FlickrService service = new FlickrService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String callback = getFullUrl(req, "/verify");
-        FlickrService service = new FlickrService();
+        String callback = getFullUrl(req, VerifyServlet.class.getAnnotation(WebServlet.class).value()[0]);
         FlickrAuthorizeResult result = service.authorize(callback);
-        String secret = result.getSecret();
-        req.getSession().setAttribute(TOKEN_SECRET, secret);
+        req.getSession().setAttribute(TOKEN_SECRET, result.getSecret());
         resp.sendRedirect(result.getAuthorizationUrl());
     }
     
