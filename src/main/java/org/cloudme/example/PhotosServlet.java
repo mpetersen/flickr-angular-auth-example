@@ -13,6 +13,8 @@ import com.google.common.io.ByteStreams;
 
 @WebServlet( "/photos" )
 public class PhotosServlet extends HttpServlet {
+    private final FlickrService service = new FlickrService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String clientToken = req.getHeader("clientToken");
@@ -21,7 +23,6 @@ public class PhotosServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
         else {
-            FlickrService service = new FlickrService();
             InputStream in = service.photosSearch(account);
             ByteStreams.copy(in, resp.getOutputStream());
         }

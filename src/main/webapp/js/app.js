@@ -7,7 +7,6 @@ angular.module('app', ['ngRoute', 'flickrAuth'])
   });
 }])
 .controller('PhotosCtrl', ['$scope', '$http', function($scope, $http) {
-  $scope.text = "Hello, World!";
   $http
   .get('/photos')
   .success(function(data) {
