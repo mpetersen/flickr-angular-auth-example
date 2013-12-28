@@ -1,13 +1,13 @@
 angular.module('flickrAuth', ['ngRoute'])
-.config(function($routeProvider) {
+.config(['$routeProvider', function($routeProvider) {
   $routeProvider
   .when('/authorize/:clientToken', {
     controller: 'AuthorizeCtrl',
     template: '<h1>Authorized</h1><p>Redirecting...</p>'
   });
-})
-.config(function($httpProvider) {
-  $httpProvider.interceptors.push(function($q, $location) {
+}])
+.config(['$httpProvider', function($httpProvider) {
+  $httpProvider.interceptors.push(['$q', '$location', function($q, $location) {
     return {
       'request': function(config) {
         config.headers['clientToken'] = localStorage['clientToken'];
@@ -21,8 +21,8 @@ angular.module('flickrAuth', ['ngRoute'])
         return $q.reject(response);
       }
     };
-  });
-})
+  }]);
+}])
 .controller('AuthorizeCtrl', ['$location', '$routeParams', function($location, $routeParams){
   var clientToken = $routeParams['clientToken'];
   localStorage['clientToken'] = clientToken;
