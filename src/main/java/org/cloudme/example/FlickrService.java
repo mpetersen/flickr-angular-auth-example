@@ -1,16 +1,19 @@
 package org.cloudme.example;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static org.cloudme.example.FlickrProperties.API_KEY;
 import static org.cloudme.example.FlickrProperties.API_SECRET;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.FlickrApi;
 import org.scribe.model.OAuthRequest;
-import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
@@ -19,8 +22,6 @@ import org.scribe.oauth.OAuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class FlickrService {
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     public FlickrAuthorizeResult authorize(String callback) {
         OAuthService service = service(callback);
         Token requestToken = service.getRequestToken();
@@ -29,27 +30,26 @@ public class FlickrService {
     }
     
     public FlickrAccount verify(Token requestToken, Verifier verifier, HttpServletRequest req) {
-        Token accessToken = service().getAccessToken(requestToken, verifier);
-        FlickrAccount account = testLogin(accessToken);
-        account.setAccessToken(accessToken);
-        return account;
+        OAuthService service = service();
+        Token accessToken = service.getAccessToken(requestToken, verifier);
+        InputStream in = testLogin(accessToken);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            FlickrAccount account = objectMapper.readValue(in, FlickrAccount.class);
+            account.setAccessToken(accessToken);
+            return account;
+        }
+        catch (IOException e) {
+            return null;
+        }
     }
     
-    public FlickrAccount testLogin(Token accessToken) {
-        try {
-            Response response = signAndSend(accessToken, createRequest("flickr.test.login"));
-            return objectMapper.readValue(response.getStream(), FlickrAccount.class);
-        }
-        catch (Exception e) {
-            throw new RuntimeException();
-        }
+    public InputStream testLogin(Token accessToken) {
+        return call("flickr.test.login", accessToken);
     }
 
-    public InputStream photosSearch(FlickrAccount account) {
-        OAuthRequest request = createRequest("flickr.photos.search");
-        request.addQuerystringParameter("user_id", account.getId());
-        Response response = signAndSend(account.getAccessToken(), request);
-        return response.getStream();
+    public InputStream photosSearch(Token accessToken, String id) {
+        return call("flickr.photos.search", accessToken, of("user_id", id));
     }
 
     private OAuthService service() {
@@ -66,17 +66,22 @@ public class FlickrService {
         }
         return serviceBuilder.build();
     }
+    
+    private InputStream call(String method, Token accessToken) {
+        return call(method, accessToken, null);
+    }
 
-    private OAuthRequest createRequest(String method) {
+    private InputStream call(String method, Token accessToken, Map<String, String> params) {
         OAuthRequest request = new OAuthRequest(Verb.GET, "http://ycpi.api.flickr.com/services/rest");
         request.addQuerystringParameter("format", "json");
         request.addQuerystringParameter("nojsoncallback", "1");
         request.addQuerystringParameter("method", method);
-        return request;
-    }
-    
-    private Response signAndSend(Token accessToken, OAuthRequest request) {
+        if (params != null) {
+            for (Entry<String, String> param : params.entrySet()) {
+                request.addQuerystringParameter(param.getKey(), param.getValue());
+            }
+        }
         service().signRequest(accessToken, request);
-        return request.send();
+        return request.send().getStream();
     }
 }
