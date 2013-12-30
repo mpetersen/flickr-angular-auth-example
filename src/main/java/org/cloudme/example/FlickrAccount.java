@@ -1,11 +1,13 @@
 package org.cloudme.example;
 
+import java.security.Principal;
+
 import org.scribe.model.Token;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize( using = FlickrAccountDeserializer.class )
-public class FlickrAccount {
+public class FlickrAccount implements Principal {
     private String id;
     private String username;
     private String oauthSecret;
@@ -34,5 +36,10 @@ public class FlickrAccount {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+    
+    @Override
+    public String getName() {
+        return username;
     }
 }
